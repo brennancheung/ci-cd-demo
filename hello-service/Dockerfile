@@ -1,5 +1,5 @@
 FROM node:12
-WORKDIR /workspace
+WORKDIR /app
 COPY . .
 RUN yarn
 EXPOSE 3000
