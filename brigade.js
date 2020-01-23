@@ -6,7 +6,7 @@ const runJob = (name, image, tasks = []) => {
   const fullImage = `${registry}/${image}`
   const job = new Job(name, fullImage, tasks, true)
   job.streamLogs = true
-  job.imagePullSecrets = ['regcreds']
+  job.imagePullSecrets = ['regcred']
   job.run()
   return job
 }
