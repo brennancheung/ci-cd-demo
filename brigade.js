@@ -11,7 +11,6 @@ const sendCheckStatus = (e, summary = 'Beginning test run', conclusion, text) =>
   // const checkRunImage = `${registry}/report-check-status`
 
   const job = new Job('start-run', checkRunImage)
-  /*
   job.env = {
     CHECK_PAYLOAD: e.payload,
     CHECK_NAME: 'tests',
@@ -20,7 +19,6 @@ const sendCheckStatus = (e, summary = 'Beginning test run', conclusion, text) =>
     CHECK_CONCLUSION: conclusion,
     CHECK_TEXT: text,
   }
-  */
   // job.streamLogs = false
   // job.imagePullSecrets = ['regcred']
   // job.imageForcePull = false
