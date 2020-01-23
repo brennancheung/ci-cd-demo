@@ -1,4 +1,4 @@
-const { events } = require('brigadier')
+const { events, Job } = require('brigadier')
 
 events.on('push', (e, project) => {
   // Webhook event received
