@@ -1,25 +1,24 @@
 const { events, Job } = require('brigadier')
 
+const registry = 'core.harbor.volgenic.com/ui'
+
+const runJob = (name, image, tasks = []) => {
+  const fullImage = `${registry}/${image}`
+  const job = new Job(name, fullImage, tasks, true)
+  job.streamLogs = true
+  job.imagePullSecrets = ['regcreds']
+  job.run()
+  return job
+}
+
 events.on('push', (e, project) => {
   // Webhook event received
   console.log(`Received push for commit ${e.revision.commit}`)
-  console.log(JSON.stringify(e.revision, null, 4))
 
   // Run unit tests
   console.log('About to run unit tests')
 
-  var jest = new Job('jest-runner')
-  jest.image = "core.harbor.volgenic.com/ui/hello-service:latest"
-  jest.tasks = ['yarn jest']
-  jest.streamLogs = true
-  jest.imagePullSecrets = ['regcred']
-  jest.run()
-
   // Try to run in parallel
-  var jest2 = new Job('jest-runner2')
-  jest2.image = "core.harbor.volgenic.com/ui/hello-service:latest"
-  jest2.tasks = ['yarn jest']
-  jest2.streamLogs = true
-  jest2.imagePullSecrets = ['regcred']
-  jest2.run()
+  runJob('jest-runner', 'hello-service', ['yarn jest'])
+  runJob('jest-runner2', 'hello-service', ['yarn jest'])
 })
