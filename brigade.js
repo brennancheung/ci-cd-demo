@@ -12,4 +12,5 @@ events.on('push', (e, project) => {
   jest.streamLogs = true
   jest.imagePullSecrets = ['regcred']
   jest.run()
+  // run again
 })
