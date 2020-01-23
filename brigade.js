@@ -11,5 +11,5 @@ events.on('push', (e, project) => {
   jest.tasks = ['yarn jest']
   jest.streamLogs = true
   jest.imagePullSecrets = ['regcred']
-  jestRunner.run()
+  jest.run()
 })
