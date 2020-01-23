@@ -3,14 +3,23 @@ const { events, Job } = require('brigadier')
 events.on('push', (e, project) => {
   // Webhook event received
   console.log(`Received push for commit ${e.revision.commit}`)
+  console.log(JSON.stringify(e, null, 4))
 
   // Run unit tests
   console.log('About to run unit tests')
+
   var jest = new Job('jest-runner')
   jest.image = "core.harbor.volgenic.com/ui/hello-service:latest"
   jest.tasks = ['yarn jest']
   jest.streamLogs = true
   jest.imagePullSecrets = ['regcred']
   jest.run()
-  // run again
+
+  // Try to run in parallel
+  var jest2 = new Job('jest-runner')
+  jest2.image = "core.harbor.volgenic.com/ui/hello-service:latest"
+  jest2.tasks = ['yarn jest']
+  jest2.streamLogs = true
+  jest2.imagePullSecrets = ['regcred']
+  jest2.run()
 })
