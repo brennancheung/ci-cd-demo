@@ -4,7 +4,11 @@ const registry = 'core.harbor.volgenic.com/ui'
 
 const sendCheckStatus = (e, summary = 'Beginning test run', conclusion, text) => {
   // This Check Run image handles updating GitHub
-  const checkRunImage = 'brigadecore/brigade-github-check-run:latest'
+  // const checkRunImage = 'brigadecore/brigade-github-check-run:latest'
+
+  // This image was pulled from Docker Hub and added to the local private registry to avoid
+  // network latency and to make tests run faster.
+  const checkRunImage = `${registry}/report-check-status`
 
   const job = new Job('start-run', checkRunImage)
   job.env = {
@@ -15,6 +19,9 @@ const sendCheckStatus = (e, summary = 'Beginning test run', conclusion, text) =>
     CHECK_CONCLUSION: conclusion,
     CHECK_TEXT: text,
   }
+  job.streamLogs = false
+  job.imagePullSecrets = ['regcred']
+  job.imageForcePull = false
   return job.run()
 }
 
