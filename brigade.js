@@ -40,9 +40,9 @@ events.on('check_suite:requested', (e, project) => {
 
   // Run unit tests
   console.log('About to run unit tests')
-  sendCheckStatus(e)
+  //sendCheckStatus(e)
 
   createJob('jest-runner', 'hello-service', ['yarn jest']).run()
-    .then(result => sendCheckStatus(e, 'Tests passed', 'success', result.toString()))
-    .catch(err => sendCheckStatus(e, 'Tests failed', 'failure', err))
+  //  .then(result => sendCheckStatus(e, 'Tests passed', 'success', result.toString()))
+  //  .catch(err => sendCheckStatus(e, 'Tests failed', 'failure', err))
 })
