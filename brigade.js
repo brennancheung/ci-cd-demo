@@ -19,7 +19,7 @@ events.on('check_suite:requested', async (e, project) => {
       CHECK_SUMMARY: options.summary,
     }
     const conclusionStages = ['success', 'failure']
-    if (conclusionStages.include(stage)) env.CHECK_CONCLUSION = stage
+    if (conclusionStages.includes(stage)) env.CHECK_CONCLUSION = stage
     if (options.text) env.CHECK_TEXT = options.text
     console.log(JSON.stringify(options, null, 4))
     job.imageForcePull = false
