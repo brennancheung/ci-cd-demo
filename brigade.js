@@ -43,21 +43,18 @@ events.on('check_suite:requested', async (e, project) => {
     const successMessage = `${title} test succeeded`
     const failMessage = `${title} test failed`
     sendCheckStatus(checkName, 'start', {
-      name: testName,
       title: startMessage,
       summary: startMessage
     })
     try {
       const results = await job.run()
       sendCheckStatus(checkName, 'success', {
-        name: testName,
         title: successMessage,
         summary: successMessage,
         text: results.toString(),
       })
     } catch (err) {
       sendCheckStatus(checkName, 'fail', {
-        name: testName,
         title: failMessage,
         summary: failMessage,
         text: err,
