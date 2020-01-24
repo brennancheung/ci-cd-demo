@@ -4,11 +4,11 @@ const registry = 'core.harbor.volgenic.com/ui'
 
 const sendCheckStatus = (e, summary = 'Beginning test run', conclusion, text) => {
   // This Check Run image handles updating GitHub
-  const checkRunImage = 'brigadecore/brigade-github-check-run:latest'
+  // const checkRunImage = 'brigadecore/brigade-github-check-run:latest'
 
   // This image was pulled from Docker Hub and added to the local private registry to avoid
   // network latency and to make tests run faster.
-  // const checkRunImage = `${registry}/report-check-status`
+  const checkRunImage = `${registry}/report-check-status`
 
   const job = new Job('start-run', checkRunImage)
   const env = {
@@ -16,14 +16,13 @@ const sendCheckStatus = (e, summary = 'Beginning test run', conclusion, text) =>
     CHECK_NAME: 'tests',
     CHECK_TITLE: 'Tests',
     CHECK_SUMMARY: summary,
-    CHECK_CONCLUSION: conclusion,
-    CHECK_TEXT: text,
   }
-  job.imageForcePull = true
+  if (conclusion) env.CHECK_CONCLUSION = conclusion
+  if (text) env.CHECK_TEXT = text
+  job.imageForcePull = false
   job.env = env
-  // job.streamLogs = false
-  // job.imagePullSecrets = ['regcred']
-  // job.imageForcePull = false
+  job.streamLogs = false
+  job.imagePullSecrets = ['regcred']
   return job.run()
 }
 
@@ -45,6 +44,6 @@ events.on('check_suite:requested', (e, project) => {
   sendCheckStatus(e)
 
   createJob('jest-runner', 'hello-service', ['yarn jest']).run()
-  //  .then(result => sendCheckStatus(e, 'Tests passed', 'success', result.toString()))
-  //  .catch(err => sendCheckStatus(e, 'Tests failed', 'failure', err))
+    .then(result => sendCheckStatus(e, 'Tests passed', 'success', result.toString()))
+    .catch(err => sendCheckStatus(e, 'Tests failed', 'failure', err))
 })
