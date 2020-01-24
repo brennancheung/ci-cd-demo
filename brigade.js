@@ -20,7 +20,7 @@ const sendCheckStatus = (e, summary = 'Beginning test run', conclusion, text) =>
   }
   if (conclusion) env.CHECK_CONCLUSION = conclusion
   if (text) env.CHECK_TEXT = text
-  job.imageForcePull = false
+  job.imageForcePull = true
   job.env = env
   job.streamLogs = false
   job.imagePullSecrets = ['regcred']
