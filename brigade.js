@@ -72,3 +72,4 @@ events.on('check_suite:requested', async (e, project) => {
   runTest('lint', 'Lint', lintJob)
   runTest('unit-tests', 'Unit', unitTestsJob)
 })
+//retry
