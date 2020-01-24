@@ -1,56 +1,50 @@
-const { events, Job } = require("brigadier");
+const { events, Job } = require('brigadier')
 
-// GitHub Check events to watch for
-//
-// Note that a GitHub App will automatically generate these events
-// from a `push` event, so we don't need an explicit push event handler any longer
-events.on("check_suite:requested", checkRequested);
-events.on("check_suite:rerequested", checkRequested);
-events.on("check_run:rerequested", checkRequested);
+const registry = 'core.harbor.volgenic.com/ui'
 
-// This runs our main test job, updating GitHub along the way
-function checkRequested(e, p) {
-  console.log("check requested");
-
+const sendCheckStatus = (e, summary = 'Beginning test run', conclusion, text) => {
   // This Check Run image handles updating GitHub
-  const checkRunImage = "brigadecore/brigade-github-check-run:latest";
+  const checkRunImage = 'brigadecore/brigade-github-check-run:latest'
 
-  // Common configuration
+  // This image was pulled from Docker Hub and added to the local private registry to avoid
+  // network latency and to make tests run faster.
+  // const checkRunImage = `${registry}/report-check-status`
+
+  const job = new Job('start-run', checkRunImage)
   const env = {
     CHECK_PAYLOAD: e.payload,
-    CHECK_NAME: "Brigade",
-    CHECK_TITLE: "Run Tests",
-  };
-
-  // For convenience, we'll create three jobs: one for each GitHub Check
-  // stage.
-  const start = new Job("start-run", checkRunImage);
-  start.imageForcePull = true;
-  start.env = env;
-  start.env.CHECK_SUMMARY = "Beginning test run";
-
-  const end = new Job("end-run", checkRunImage);
-  end.imageForcePull = true;
-  end.env = env;
-
-  // Now we run the jobs in order:
-  // - Notify GitHub of start
-  // - Run the tests
-  // - Notify GitHub of completion
-  //
-  // On error, we catch the error and notify GitHub of a failure.
-  start.run().then(() => {
-    return 'successful test run'
-  }).then( (result) => {
-    end.env.CHECK_CONCLUSION = "success"
-    end.env.CHECK_SUMMARY = "Build completed"
-    end.env.CHECK_TEXT = result.toString()
-    return end.run()
-  }).catch( (err) => {
-    // In this case, we mark the ending failed.
-    end.env.CHECK_CONCLUSION = "failure"
-    end.env.CHECK_SUMMARY = "Build failed"
-    end.env.CHECK_TEXT = `Error: ${ err }`
-    return end.run()
-  });
+    CHECK_NAME: 'tests',
+    CHECK_TITLE: 'Tests',
+    CHECK_SUMMARY: summary,
+    CHECK_CONCLUSION: conclusion,
+    CHECK_TEXT: text,
+  }
+  job.imageForcePull = true
+  job.env = env
+  // job.streamLogs = false
+  // job.imagePullSecrets = ['regcred']
+  // job.imageForcePull = false
+  return job.run()
 }
+
+const createJob = (name, image, tasks = []) => {
+  const fullImage = `${registry}/${image}`
+  const job = new Job(name, fullImage, tasks, true)
+  job.streamLogs = true
+  job.imagePullSecrets = ['regcred']
+  job.imageForcePull = true
+  return job
+}
+
+events.on('check_suite:requested', (e, project) => {
+  // Webhook event received
+  console.log(`Received check_suite for commit ${e.revision.commit}`)
+
+  // Run unit tests
+  console.log('About to run unit tests')
+  sendCheckStatus(e)
+
+  createJob('jest-runner', 'hello-service', ['yarn jest']).run()
+  //  .then(result => sendCheckStatus(e, 'Tests passed', 'success', result.toString()))
+  //  .catch(err => sendCheckStatus(e, 'Tests failed', 'failure', err))
+})
