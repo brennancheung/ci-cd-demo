@@ -9,7 +9,7 @@ events.on('check_suite:requested', async (e, project) => {
     // Local copy of image above to avoid network traffic and to speed up tests.
     const checkRunImage = `${registry}/report-check-status`
 
-    const jobName = `${checkName}-${stage}`
+    const jobName = `${options,checkName}-${stage}`
     console.log(`job name: ${jobName}`)
     const job = new Job(jobName, checkRunImage)
     const env = {
