@@ -50,14 +50,14 @@ events.on('check_suite:requested', async (e, project) => {
     })
     try {
       const results = await job.run()
-      sendCheckStatus(checkName, 'success', {
+      sendCheckStatus('success', {
         checkName,
         title: successMessage,
         summary: successMessage,
         text: results.toString(),
       })
     } catch (err) {
-      sendCheckStatus(checkName, 'fail', {
+      sendCheckStatus('fail', {
         checkName,
         title: failMessage,
         summary: failMessage,
@@ -69,5 +69,3 @@ events.on('check_suite:requested', async (e, project) => {
   const lintJob = createJob('lint-runner', 'hello-service', ['yarn jest'])
   runTest('lint', 'Lint', lintJob)
 })
-
-// retry
