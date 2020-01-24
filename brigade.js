@@ -36,15 +36,7 @@ events.on('check_suite:requested', async (e, project) => {
   // Webhook event received
   console.log(`Received check_suite for commit ${e.revision.commit}`)
 
-  // Run unit tests
-  console.log('About to run unit tests')
-  sendCheckStatus('start-run', {
-    name: 'lint',
-    title: 'Linting',
-    summary: 'Starting lint tests',
-  })
-
-  const runTest = (testName, title, job) => {
+  const runTest = async (testName, title, job) => {
     const startMessage = `${title} test starting`
     const successMessage = `${title} test succeeded`
     const failMessage = `${title} test failed`
