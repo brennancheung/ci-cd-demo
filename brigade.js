@@ -20,7 +20,7 @@ events.on('check_suite:requested', async (e, project) => {
     }
     if (options.conclusion) env.CHECK_CONCLUSION = options.conclusion
     if (options.text) env.CHECK_TEXT = options.text
-    console.log(JSON.stringy(options, null, 4))
+    console.log(JSON.stringify(options, null, 4))
     job.imageForcePull = false
     job.env = env
     job.streamLogs = false
