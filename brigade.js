@@ -69,3 +69,5 @@ events.on('check_suite:requested', async (e, project) => {
   const lintJob = createJob('lint-runner', 'hello-service', ['yarn jest'])
   runTest('lint', 'Lint', lintJob)
 })
+
+// retry
