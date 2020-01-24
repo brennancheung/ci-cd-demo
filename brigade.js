@@ -3,7 +3,7 @@ const { events, Job } = require('brigadier')
 const registry = 'core.harbor.volgenic.com/ui'
 
 events.on('check_suite:requested', async (e, project) => {
-  const sendCheckStatus = (checkName, stage, options = {}) => {
+  const sendCheckStatus = (stage, options = {}) => {
     console.log('Sending check status')
     // const checkRunImage = 'brigadecore/brigade-github-check-run:latest'
     // Local copy of image above to avoid network traffic and to speed up tests.
@@ -42,19 +42,22 @@ events.on('check_suite:requested', async (e, project) => {
     const startMessage = `${title} test starting`
     const successMessage = `${title} test succeeded`
     const failMessage = `${title} test failed`
-    sendCheckStatus(checkName, 'start', {
+    sendCheckStatus('start', {
+      checkName,
       title: startMessage,
       summary: startMessage
     })
     try {
       const results = await job.run()
       sendCheckStatus(checkName, 'success', {
+        checkName,
         title: successMessage,
         summary: successMessage,
         text: results.toString(),
       })
     } catch (err) {
       sendCheckStatus(checkName, 'fail', {
+        checkName,
         title: failMessage,
         summary: failMessage,
         text: err,
@@ -64,5 +67,4 @@ events.on('check_suite:requested', async (e, project) => {
 
   const lintJob = createJob('lint-runner', 'hello-service', ['yarn jest'])
   runTest('lint', 'Lint', lintJob)
-  // retry
 })
