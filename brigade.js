@@ -14,10 +14,10 @@ events.on('check_suite:requested', async (e, project) => {
       CHECK_PAYLOAD: e.payload,
       CHECK_NAME: options.name,
       CHECK_TITLE: options.title,
-      CHECK_SUMMARY: summary,
+      CHECK_SUMMARY: options.summary,
     }
-    if (conclusion) env.CHECK_CONCLUSION = conclusion
-    if (text) env.CHECK_TEXT = text
+    if (options.conclusion) env.CHECK_CONCLUSION = options.conclusion
+    if (options.text) env.CHECK_TEXT = options.text
     job.imageForcePull = false
     job.env = env
     job.streamLogs = false
