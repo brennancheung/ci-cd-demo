@@ -44,22 +44,33 @@ events.on('check_suite:requested', async (e, project) => {
     summary: 'Starting lint tests',
   })
 
-  try {
-    const result = await createJob('jest-runner', 'hello-service', ['yarn jest']).run()
-    sendCheckStatus('jest-results', {
-      name: 'lint',
-      title: 'Linting',
-      summary: 'Linting succeeded',
-      conclusion: 'success',
-      text: result.toString(),
+  const runTest = (testName, title, job) => {
+    const startMessage = `${title} test starting`
+    const successMessage = `${title} test succeeded`
+    const failMessage = `${title} test failed`
+    sendCheckStatus(`start-${testName}`, {
+      name: testName,
+      title: startMessage,
+      summary: startMessage
     })
-  } catch (err) {
-    sendCheckStatus('jest-results', {
-      name: 'lint',
-      title: 'Linting',
-      summary: 'Linting failed',
-      conclusion: 'failure',
-      text: err,
-    })
-  }
+    try {
+      const results = await job.run()
+      sendCheckStatus('${testName}-results', {
+        name: testName,
+        title: successMessage,
+        summary: successMessage,
+        text: results.toString(),
+      })
+    } catch (err) {
+      sendCheckStatus('${testName}-results', {
+        name: testName,
+        title: failMessage,
+        summary: failMessage,
+        text: err,
+      })
+    }
+  } 
+
+  const lintJob = createJob('lint-runner', 'hello-service', ['yarn jest'])
+  runTest('lint', 'Lint', lintJob)
 })
