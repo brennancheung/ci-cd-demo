@@ -68,5 +68,7 @@ events.on('check_suite:requested', async (e, project) => {
   } 
 
   const lintJob = createJob('lint-runner', 'hello-service', ['yarn jest'])
+  const unitTestsJob = createJob('lint-runner', 'hello-service', ['yarn jest'])
   runTest('lint', 'Lint', lintJob)
+  runTest('unit-tests', 'Unit', unitTestsJob)
 })
