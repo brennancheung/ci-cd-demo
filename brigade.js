@@ -3,6 +3,7 @@ const { events, Job } = require('brigadier')
 const registry = 'core.harbor.volgenic.com/ui'
 
 const sendCheckStatus = (e, summary = 'Beginning test run', conclusion, text) => {
+  console.log('Sending check status')
   // This Check Run image handles updating GitHub
   // const checkRunImage = 'brigadecore/brigade-github-check-run:latest'
 
