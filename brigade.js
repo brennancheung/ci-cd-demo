@@ -2,27 +2,23 @@ const { events, Job } = require('brigadier')
 
 const registry = 'core.harbor.volgenic.com/ui'
 
-
-events.on('check_suite:requested', (e, project) => {
-  const sendCheckStatus = (jobName, summary = 'Beginning test run', conclusion, text) => {
+events.on('check_suite:requested', async (e, project) => {
+  const sendCheckStatus = (jobName, options = {}) => {
     console.log('Sending check status')
-    // This Check Run image handles updating GitHub
     // const checkRunImage = 'brigadecore/brigade-github-check-run:latest'
-
-    // This image was pulled from Docker Hub and added to the local private registry to avoid
-    // network latency and to make tests run faster.
+    // Local copy of image above to avoid network traffic and to speed up tests.
     const checkRunImage = `${registry}/report-check-status`
 
     const job = new Job(jobName, checkRunImage)
     const env = {
       CHECK_PAYLOAD: e.payload,
-      CHECK_NAME: 'tests',
-      CHECK_TITLE: 'Tests',
+      CHECK_NAME: options.name,
+      CHECK_TITLE: options.title,
       CHECK_SUMMARY: summary,
     }
     if (conclusion) env.CHECK_CONCLUSION = conclusion
     if (text) env.CHECK_TEXT = text
-    job.imageForcePull = true
+    job.imageForcePull = false
     job.env = env
     job.streamLogs = false
     job.imagePullSecrets = ['regcred']
@@ -42,9 +38,28 @@ events.on('check_suite:requested', (e, project) => {
 
   // Run unit tests
   console.log('About to run unit tests')
-  sendCheckStatus('start-run')
+  sendCheckStatus('start-run', {
+    name: 'lint',
+    title: 'Linting',
+    summary: 'Starting lint tests',
+  })
 
-  createJob('jest-runner', 'hello-service', ['yarn jest']).run()
-    .then(result => sendCheckStatus('jest-results', 'Tests passed', 'success', result.toString()))
-    .catch(err => sendCheckStatus('jest-results', 'Tests failed', 'failure', err))
+  try {
+    const result = await createJob('jest-runner', 'hello-service', ['yarn jest']).run()
+    sendCheckStatus('jest-results', {
+      name: 'lint',
+      title: 'Linting',
+      summary: 'Linting succeeded',
+      conclusion: 'success',
+      text: result.toString(),
+    })
+  } catch (err) {
+    sendCheckStatus('jest-results', {
+      name: 'lint',
+      title: 'Linting',
+      summary: 'Linting failed',
+      conclusion: 'failure',
+      text: err,
+    })
+  }
 })
