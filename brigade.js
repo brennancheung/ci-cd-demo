@@ -4,13 +4,11 @@ const registry = 'core.harbor.volgenic.com/ui'
 
 events.on('check_suite:requested', async (e, project) => {
   const sendCheckStatus = (stage, options = {}) => {
-    console.log('Sending check status')
     // const checkRunImage = 'brigadecore/brigade-github-check-run:latest'
     // Local copy of image above to avoid network traffic and to speed up tests.
     const checkRunImage = `${registry}/report-check-status`
 
     const jobName = `${options.checkName}-${stage}`
-    console.log(`job name: ${jobName}`)
     const job = new Job(jobName, checkRunImage)
     const env = {
       CHECK_PAYLOAD: e.payload,
@@ -21,7 +19,6 @@ events.on('check_suite:requested', async (e, project) => {
     const conclusionStages = ['success', 'failure']
     if (conclusionStages.includes(stage)) env.CHECK_CONCLUSION = stage
     if (options.text) env.CHECK_TEXT = options.text
-    console.log(JSON.stringify(options, null, 4))
     job.imageForcePull = false
     job.env = env
     job.streamLogs = false
