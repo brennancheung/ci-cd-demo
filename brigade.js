@@ -49,14 +49,14 @@ events.on('check_suite:requested', async (e, project) => {
     })
     try {
       const results = await job.run()
-      sendCheckStatus('${testName}-results', {
+      sendCheckStatus(`${testName}-results`, {
         name: testName,
         title: successMessage,
         summary: successMessage,
         text: results.toString(),
       })
     } catch (err) {
-      sendCheckStatus('${testName}-results', {
+      sendCheckStatus(`${testName}-results`, {
         name: testName,
         title: failMessage,
         summary: failMessage,
