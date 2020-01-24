@@ -18,7 +18,8 @@ events.on('check_suite:requested', async (e, project) => {
       CHECK_TITLE: options.title,
       CHECK_SUMMARY: options.summary,
     }
-    if (options.conclusion) env.CHECK_CONCLUSION = options.conclusion
+    const conclusionStages = ['success', 'failure']
+    if (conclusionStages.include(stage)) env.CHECK_CONCLUSION = stage
     if (options.text) env.CHECK_TEXT = options.text
     console.log(JSON.stringify(options, null, 4))
     job.imageForcePull = false
@@ -57,7 +58,7 @@ events.on('check_suite:requested', async (e, project) => {
         text: results.toString(),
       })
     } catch (err) {
-      sendCheckStatus('fail', {
+      sendCheckStatus('failure', {
         checkName,
         title: failMessage,
         summary: failMessage,
