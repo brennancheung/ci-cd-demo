@@ -9,6 +9,7 @@ events.on('check_suite:requested', async (e, project) => {
     // Local copy of image above to avoid network traffic and to speed up tests.
     const checkRunImage = `${registry}/report-check-status`
 
+    console.log(`job name: ${jobName}`)
     const job = new Job(jobName, checkRunImage)
     const env = {
       CHECK_PAYLOAD: e.payload,
@@ -27,6 +28,7 @@ events.on('check_suite:requested', async (e, project) => {
 
   const createJob = (name, image, tasks = []) => {
     const fullImage = `${registry}/${image}`
+    console.log(`job name: ${name}`)
     const job = new Job(name, fullImage, tasks, true)
     job.streamLogs = true
     job.imagePullSecrets = ['regcred']
