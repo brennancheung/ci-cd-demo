@@ -81,21 +81,21 @@ exports.helpers = (e, project) => {
       const startMessage = `${title} test starting`
       const successMessage = `${title} test succeeded`
       const failMessage = `${title} test failed`
-      sendCheckStatus('start', {
+      this.sendCheckStatus('start', {
         checkName,
         title: startMessage,
         summary: startMessage
       })
       try {
         const results = await job.run()
-        sendCheckStatus('success', {
+        this.sendCheckStatus('success', {
           checkName,
           title: successMessage,
           summary: successMessage,
           text: results.toString(),
         })
       } catch (err) {
-        sendCheckStatus('failure', {
+        this.sendCheckStatus('failure', {
           checkName,
           title: failMessage,
           summary: failMessage,
