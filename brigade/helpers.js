@@ -1,6 +1,6 @@
-export const prettyPrint = obj => console.log(JSON.stringify(obj, null, 4))
+exports.prettyPrint = obj => console.log(JSON.stringify(obj, null, 4))
 
-export const helpers = (e, project) => {
+exports.helpers = (e, project) => {
   // The Docker container registry (FQDN) where we want to push / pull images are saved in the 'project' context.
   const registry = project.secrets.registry
 
