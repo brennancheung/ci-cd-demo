@@ -21,7 +21,7 @@ events.on('check_suite:requested', async (e, project) => {
   const payload = JSON.parse(e.payload)
   console.log(JSON.stringify(JSON.parse(e.payload), null, 4))
 
-  const prNumber = payload.body.pull_requests[0].number
+  const prNumber = payload.body.check_suite.pull_requests[0].number
   const { commit, ref } = e.revision
 
   console.log(JSON.stringify({ prNumber, commit, ref }, null, 4))
