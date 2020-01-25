@@ -1,5 +1,5 @@
 const { events, Job } = require('brigadier')
-const helpers = require('./helpers')
+const helpers = require('./brigade/helpers')
 
 events.on('check_suite:requested', async (e, project) => {
   const { createJob, runTest } = helpers(e, project)
