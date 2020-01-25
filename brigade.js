@@ -17,6 +17,9 @@ events.on('check_suite:requested', async (e, project) => {
   console.log('project info:')
   console.log(JSON.stringify(e, null, 4))
 
+  console.log('payload info:')
+  console.log(JSON.stringify(JSON.parse(e.payload), null, 4))
+
   const sendCheckStatus = (stage, options = {}) => {
     // const checkRunImage = 'brigadecore/brigade-github-check-run:latest'
     // Local copy of image above to avoid network traffic and to speed up tests.
