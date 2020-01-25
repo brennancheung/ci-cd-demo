@@ -1,34 +1,43 @@
 const { events, Job } = require('brigadier')
 
+// FQDN for container registry
 let registry = ''
 
-events.on('check_suite:requested', async (e, project) => {
+const prettyPrint = obj => console.log(JSON.stringify(obj, null, 4))
+
+const logEventParams = (e, project) => {
   // Webhook event received
   console.log(`Received check_suite for commit ${e.revision.commit}`)
 
-  // The Docker container registry where we want to push / pull images are
-  // saved in the 'project' context.
-  registry = project.secrets.registry
-  console.log(`Container registry set to: ${registry}`)
-
   console.log('event info:')
-  console.log(JSON.stringify(e, null, 4))
+  prettyPrint(e)
 
   console.log('project info:')
-  console.log(JSON.stringify(e, null, 4))
+  printPrint(project)
 
   console.log('payload info:')
   const payload = JSON.parse(e.payload)
-  console.log(JSON.stringify(JSON.parse(e.payload), null, 4))
+  printPrint(e.payload)
 
+}
+events.on('check_suite:requested', async (e, project) => {
+  // The Docker container registry where we want to push / pull images are
+  // saved in the 'project' context.
+  registry = project.secrets.registry
+  // console.log(`Container registry set to: ${registry}`)
+
+  const payload = JSON.parse(e.payload)
   const prNumber = payload.body.check_suite.pull_requests[0].number
   const { commit, ref } = e.revision
-
-  console.log(JSON.stringify({ prNumber, commit, ref }, null, 4))
+  // console.log(JSON.stringify({ prNumber, commit, ref }, null, 4))
 
   const sendCheckStatus = (stage, options = {}) => {
+    // This image makes API calls to the Github Checks API.  What you want to send is
+    // set in the container's ENV variables.
+    // For more info, see: https://docs.brigade.sh/intro/tutorial04/#wrapping-our-job-in-github-checks
     // const checkRunImage = 'brigadecore/brigade-github-check-run:latest'
-    // Local copy of image above to avoid network traffic and to speed up tests.
+
+    // Local copy of above image to avoid network traffic and to speed up tests.
     const checkRunImage = `${registry}/report-check-status`
 
     const jobName = `${options.checkName}-${stage}`
@@ -45,6 +54,9 @@ events.on('check_suite:requested', async (e, project) => {
     job.imageForcePull = false
     job.env = env
     job.streamLogs = false
+
+    // Secrets to connect to the private container registry (habor) are stored in the cluster's secrets
+    // For more info: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/#create-a-secret-by-providing-credentials-on-the-command-line
     job.imagePullSecrets = ['regcred']
     return job.run()
   }
