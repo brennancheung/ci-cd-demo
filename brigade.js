@@ -1,8 +1,11 @@
 const { events, Job } = require('brigadier')
 
-const registry = 'core.harbor.volgenic.com/ui'
+let registry = ''
 
 events.on('check_suite:requested', async (e, project) => {
+  registry = project.secrets.registry
+  console.log(`Container registry set to: ${registry}`)
+
   const sendCheckStatus = (stage, options = {}) => {
     // const checkRunImage = 'brigadecore/brigade-github-check-run:latest'
     // Local copy of image above to avoid network traffic and to speed up tests.
