@@ -3,8 +3,19 @@ const { events, Job } = require('brigadier')
 let registry = ''
 
 events.on('check_suite:requested', async (e, project) => {
+  // Webhook event received
+  console.log(`Received check_suite for commit ${e.revision.commit}`)
+
+  // The Docker container registry where we want to push / pull images are
+  // saved in the 'project' context.
   registry = project.secrets.registry
   console.log(`Container registry set to: ${registry}`)
+
+  console.log('event info:')
+  console.log(JSON.stringify(e, null, 4))
+
+  console.log('project info:')
+  console.log(JSON.stringify(e, null, 4))
 
   const sendCheckStatus = (stage, options = {}) => {
     // const checkRunImage = 'brigadecore/brigade-github-check-run:latest'
@@ -37,8 +48,6 @@ events.on('check_suite:requested', async (e, project) => {
     job.imageForcePull = true
     return job
   }
-  // Webhook event received
-  console.log(`Received check_suite for commit ${e.revision.commit}`)
 
   const runTest = async (checkName, title, job) => {
     const startMessage = `${title} test starting`
