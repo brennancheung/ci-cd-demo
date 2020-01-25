@@ -18,7 +18,13 @@ events.on('check_suite:requested', async (e, project) => {
   console.log(JSON.stringify(e, null, 4))
 
   console.log('payload info:')
+  const payload = JSON.parse(e.payload)
   console.log(JSON.stringify(JSON.parse(e.payload), null, 4))
+
+  const prNumber = payload.pull_requests[0].number
+  const { commit, ref } = e.revision
+
+  console.log(JSON.stringify({ prNumber, commit, ref }, null, 4))
 
   const sendCheckStatus = (stage, options = {}) => {
     // const checkRunImage = 'brigadecore/brigade-github-check-run:latest'
