@@ -23,7 +23,7 @@ spec:
           - "--context=git://github.com/brennancheung/ci-cd-demo#refs/heads/checks"
           - "--dockerfile=./kaniko/Dockerfile"
           - "--destination=core.harbor.volgenic.com/ui/build-test:latest"
-          - "--build-arg=HELLOMESSAGE='hello world from args'"
+          - "--build-arg=HELLOMESSAGE=''hello world from args'"
           #- "--no-push"
         volumeMounts:
           - name: docker-config
