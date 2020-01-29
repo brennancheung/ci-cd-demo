@@ -1,0 +1,26 @@
+# kubectl exec -it pod node-runner-XXXX -- /bin/bash
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: node-runner
+  name: node-runner
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: node-runner
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: node-runner
+    spec:
+      containers:
+      - image: node:12
+        name: node
+        resources: {}
+        command: ["sleep", "10000"]
+status: {}
