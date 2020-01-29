@@ -22,14 +22,17 @@ spec:
         args:
           - "--context=git://github.com/brennancheung/ci-cd-demo#refs/heads/checks"
           - "--dockerfile=./kaniko/Dockerfile"
-          - "--no-push"
-          # - "--destination=core.harbor.volgenic.com/ui/test-build"
-          #       volumeMounts:
-          #       - name: workspace
-          #         mountPath: /workspace
-          #     volumes:
-          #     - name: workspace
-          #       persistentVolumeClaim:
-          #         claimName: kaniko-workspace
+          - "--destination=core.harbor.volgenic.com/ui/build-test:latest"
+          #- "--no-push"
+        volumeMounts:
+          - name: docker-config
+            mountPath: /kaniko/.docker
+      volumes:
+        - name: docker-config
+          secret:
+            secretName: regcred
+            items:
+              - key: .dockerconfigjson
+                path: config.json
       restartPolicy: Never
   backoffLimit: 1
