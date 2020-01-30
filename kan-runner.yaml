@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: kaniko-workspace
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 8Gi
+---
+# kubectl exec -it pod node-runner-XXXX -- /bin/bash
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: kan-runner
+  name: kan-runner
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kan-runner
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: kan-runner
+    spec:
+      containers:
+      - image: gcr.io/kaniko-project/executor:latest
+        name: kan-runner
+        resources: {}
+        command: ["sleep", "10000"]
+        volumeMounts:
+        - name: workspace
+          mountPath: /workspace
+      volumes:
+      - name: workspace
+        persistentVolumeClaim:
+          claimName: kaniko-workspace

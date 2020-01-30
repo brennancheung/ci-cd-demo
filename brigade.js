@@ -1,24 +1,13 @@
 const { events, Job } = require('brigadier')
+const { helpers } = require('./brigade/helpers')
 
-const registry = 'core.harbor.volgenic.com/ui'
+events.on('check_suite:requested', async (e, project) => {
+  // Create helpers with their context bound to the event and project.
+  const { createJob, runTest } = helpers(e, project)
 
-const runJob = (name, image, tasks = []) => {
-  const fullImage = `${registry}/${image}`
-  const job = new Job(name, fullImage, tasks, true)
-  job.streamLogs = true
-  job.imagePullSecrets = ['regcred']
-  job.run()
-  return job
-}
+  const lintJob = createJob('lint-runner', 'hello-service', ['yarn jest'])
+  runTest('lint', 'Lint', lintJob)
 
-events.on('push', (e, project) => {
-  // Webhook event received
-  console.log(`Received push for commit ${e.revision.commit}`)
-
-  // Run unit tests
-  console.log('About to run unit tests')
-
-  // Try to run in parallel
-  runJob('jest-runner', 'hello-service', ['yarn jest'])
-  runJob('jest-runner2', 'hello-service', ['yarn jest'])
+  const unitTestsJob = createJob('unit-runner', 'hello-service', ['yarn jest'])
+  runTest('unit', 'Unit', unitTestsJob)
 })
